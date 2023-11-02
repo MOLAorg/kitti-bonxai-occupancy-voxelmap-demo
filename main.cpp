@@ -12,6 +12,7 @@
 #include <mrpt/gui/CDisplayWindow3D.h>
 #include <mrpt/io/lazy_load_path.h>
 #include <mrpt/maps/CColouredPointsMap.h>
+#include <mrpt/maps/COccupancyGridMap3D.h>
 #include <mrpt/maps/CVoxelMap.h>
 #include <mrpt/math/CMatrixDynamic.h>
 #include <mrpt/obs/CObservationPointCloud.h>
@@ -71,13 +72,16 @@ void TestVoxelMapFromKitti(
 	// ----------------------
 	// Voxel map
 	// ----------------------
-	mrpt::maps::CVoxelMap map(VOXELMAP_RESOLUTION);
+	// mrpt::maps::CVoxelMap map(VOXELMAP_RESOLUTION);
+	mrpt::maps::COccupancyGridMap3D map(
+		{-100.0f, -100.0f, -5.0f}, {100.0f, 100.0f, 10.0f}, 0.20f);
 
-	map.insertionOptions.max_range = VOXELMAP_MAX_RANGE;  // [m]
-	map.insertionOptions.ray_trace_free_space = false;	// only occupied
+	map.insertionOptions.maxDistanceInsertion = VOXELMAP_MAX_RANGE;	 // [m]
+	map.insertionOptions.raytraceEmptyCells = false;
 
-	map.insertionOptions.prob_hit = 0.53;
-	map.renderingOptions.occupiedThreshold = 0.80;
+	//	map.insertionOptions.maxFreenessUpdateCertainty prob_hit = 0.53;
+	//	map.renderingOptions.occupiedThreshold = 0.80;
+	// map.insertionOptions.decimation_3d_range = 1;
 
 	// gui and demo app:
 	mrpt::gui::CDisplayWindow3D win("KITTI VoxelMap demo", 800, 600);
@@ -167,6 +171,7 @@ void TestVoxelMapFromKitti(
 			{
 				decimUpdateViz = 0;
 				map.renderingOptions.generateFreeVoxels = false;
+				map.renderingOptions.generateOccupiedVoxels = true;
 
 				mrpt::system::CTimeLoggerEntry tle2(
 					profiler, "getAsOctoMapVoxels");
@@ -196,9 +201,9 @@ void TestVoxelMapFromKitti(
 		win.addTextMessage(
 			5, 5,
 			mrpt::format(
-				"Timestamp: %s datasetIndex: %zu ActiveVoxelCells: %zu",
+				"Timestamp: %s datasetIndex: %zu",
 				mrpt::system::dateTimeLocalToString(lastObsTim).c_str(),
-				datasetIndex, map.grid().activeCellsCount()),
+				datasetIndex),
 			1 /*id*/);
 
 		win.repaint();
