@@ -21,6 +21,7 @@
 #include <mrpt/opengl/CPointCloudColoured.h>
 #include <mrpt/opengl/stock_objects.h>
 #include <mrpt/poses/CPose3DInterpolator.h>
+#include <mrpt/system/CTimeLogger.h>
 #include <mrpt/system/filesystem.h>
 #include <mrpt/system/os.h>
 
@@ -35,6 +36,8 @@
  * ./kitti-voxelmap-demo 0.10
  *
  */
+
+mrpt::system::CTimeLogger profiler;
 
 // ------------------------------------------------------
 //				TestVoxelMapFromKitti
@@ -152,7 +155,11 @@ void TestVoxelMapFromKitti(
 			glObsPts->setPose(obs->sensorPose);
 
 			// update the voxel map:
+			mrpt::system::CTimeLoggerEntry tle1(profiler, "insertObservation");
+
 			map.insertObservation(*obs, mrpt::poses::CPose3D(gtPose));
+
+			tle1.stop();
 
 			// Update the voxel map visualization:
 			static int decimUpdateViz = 0;
@@ -160,6 +167,10 @@ void TestVoxelMapFromKitti(
 			{
 				decimUpdateViz = 0;
 				map.renderingOptions.generateFreeVoxels = false;
+
+				mrpt::system::CTimeLoggerEntry tle2(
+					profiler, "getAsOctoMapVoxels");
+
 				map.getAsOctoMapVoxels(*glVoxels);
 			}
 
