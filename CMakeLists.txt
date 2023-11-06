@@ -1,4 +1,4 @@
-project(kitti-voxelmap-demo)
+project(kitti-bonxai-occupancy-voxelmap-demo)
 
 cmake_minimum_required(VERSION 3.1)
 
@@ -27,6 +27,8 @@ target_link_libraries(${PROJECT_NAME}
 	mola_input_kitti_dataset
 	mola_yaml
 )
+
+install(TARGETS ${PROJECT_NAME})
 
 # Set optimized building:
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
